@@ -1,8 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy import integrate
-from scipy import constants
+from scipy import integrate, constants
+import pandas as pd
 
+df = pd.read_excel(r'res.xlsx')
 # данные
 m0 = 28000 #масса без топлива
 M = 63150  # масса с топливом
@@ -12,7 +13,7 @@ S = constants.pi * ((0.7 / 2) ** 2) #площадь сечения
 g = constants.g
 F = [1579000, 588000]
 
-
+speed = []
 
 def dv_dt(t, v):
     if t < 16:
@@ -31,18 +32,21 @@ def dv_dt(t, v):
         return ((Ft / (M - k * t)) - ((Cf * ro * S) / (2 * (M - k * t))) * v ** 2 - g)
 
 
-
 v0 = 0
 
-t = np.linspace(0, 335, 315)
+t = np.linspace(0, 315, 375)
 
 solve = integrate.solve_ivp(dv_dt, t_span=(0, max(t)), y0=[v0], t_eval=t)
 
 x = solve.t
 y = solve.y[0]
 
-plt.figure(figsize=(8, 8))
-plt.plot(x, y, '-r', label="v(t)")
+
+x2 = df['speed'].values
+y2 = [i for i in range(0, len(x2))]
+fig, p = plt.subplots()
+p.plot(x, y, '-r', label="v(t) матмодель")
+p.plot(x, [x2[i] for i in range(0, len(x2), 4)], '-b', label="v(t) ksp")
 plt.legend()
 plt.grid(True)
 plt.show()
